@@ -104,7 +104,7 @@ Assets/
 
 ## Requirements
 
-- Unity 2021.3 or later
+- Unity 2022.3.38f1
 - Photon Unity Networking (PUN)
 - TextMeshPro package
 - .NET Framework 4.x
