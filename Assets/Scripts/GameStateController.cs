@@ -1,10 +1,4 @@
-﻿///-----------------------------------------------------------------
-///   Class:          GameStateController
-///   Description:    Handles the current state of the game and whos turn it is
-///   Author:         VueCode
-///   GitHub:         https://github.com/ivuecode/
-///-----------------------------------------------------------------
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Photon;
 using Photon.Realtime;
@@ -14,28 +8,24 @@ using TMPro;
 
 public class GameStateController : PunBehaviour
 {
-    [Header("TitleBar References")]
-    public Image playerXIcon;               // Reference to the playerX icon
-    public Image           playerOIcon;     // Reference to the playerO icon
-    public TextMeshProUGUI statusText;      // Reference to the status text
+    [Header("TitleBar References")] public Image playerXIcon; // Reference to the playerX icon
+    public Image playerOIcon; // Reference to the playerO icon
+    public TextMeshProUGUI statusText; // Reference to the status text
     public TextMeshProUGUI player1NameText; // Reference to the status text
     public TextMeshProUGUI player2NameText; // Reference to the status text
-    [Header("Asset References")]
-    public Sprite tilePlayerO;                                       // Sprite reference to O tile
-    public Sprite tilePlayerX;                                       // Sprite reference to X tile
-    public Sprite tileEmpty;                                         // Sprite reference to empty tile
-    public Text[] tileList;                                          // Gets a list of all the tiles in the scene
+    [Header("Asset References")] public Sprite tilePlayerO; // Sprite reference to O tile
+    public Sprite tilePlayerX; // Sprite reference to X tile
+    public Sprite tileEmpty; // Sprite reference to empty tile
+    public Text[] tileList; // Gets a list of all the tiles in the scene
 
-    [Header("GameState Settings")]
-    public Color inactivePlayerColor;                                // Color to display for the inactive player icon
-    public Color activePlayerColor;                                  // Color to display for the active player icon
-    public string whoPlaysFirst;                                     // Who plays first (X : 0) {NOTE! no checks are made to ensure this is either X or O}
+    [Header("GameState Settings")] public Color inactivePlayerColor; // Color to display for the inactive player icon
+    public Color activePlayerColor; // Color to display for the active player icon
+    public string whoPlaysFirst; // Who plays first (X : 0) {NOTE! no checks are made to ensure this is either X or O}
 
-    [Header("Private Variables")]
-    private string playerTurn;                                       // Internal tracking whos turn is it
-    private string player1Name;                                      // Player1 display name
-    private string player2Name;                                      // Player2 display name
-    private int moveCount;                                           // Internal move counter
+    [Header("Private Variables")] private string playerTurn; // Internal tracking whos turn is it
+    private string player1Name; // Player1 display name
+    private string player2Name; // Player2 display name
+    private int moveCount; // Internal move counter
     private bool isGameStarted;
     private bool isLocalPlayerTurn;
     private PhotonView photonView;
@@ -61,8 +51,7 @@ public class GameStateController : PunBehaviour
         else playerXIcon.color = inactivePlayerColor;
 
         //Adds a listener to the name input fields and invokes a method when the value changes. This is a callback.
-       
-        
+
 
         // Initialize game state
         isGameStarted = false;
@@ -86,7 +75,7 @@ public class GameStateController : PunBehaviour
     public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
         Debug.Log("Player Connected: " + newPlayer.NickName);
-        
+
         if (newPlayer.GetFinishedTurn() > 0)
         {
             Debug.Log("Player is reconnecting: " + newPlayer.NickName);
@@ -121,9 +110,13 @@ public class GameStateController : PunBehaviour
 
         // Determine if it's local player's turn
         isLocalPlayerTurn = (PhotonNetwork.player.IsMasterClient && whoPlaysFirst == "X") ||
-                           (!PhotonNetwork.player.IsMasterClient && whoPlaysFirst == "O");
-        player1Name          = PhotonNetwork.player.IsMasterClient ? PhotonNetwork.player.NickName : PhotonNetwork.player.GetNext().NickName;
-        player2Name          = PhotonNetwork.player.IsMasterClient ? PhotonNetwork.player.GetNext().NickName : PhotonNetwork.player.NickName;
+                            (!PhotonNetwork.player.IsMasterClient && whoPlaysFirst == "O");
+        player1Name = PhotonNetwork.player.IsMasterClient
+            ? PhotonNetwork.player.NickName
+            : PhotonNetwork.player.GetNext().NickName;
+        player2Name = PhotonNetwork.player.IsMasterClient
+            ? PhotonNetwork.player.GetNext().NickName
+            : PhotonNetwork.player.NickName;
         player1NameText.text = player1Name;
         player2NameText.text = player2Name;
         UpdateStatusText(isLocalPlayerTurn ? "Your turn!" : "Opponent's turn");
@@ -133,7 +126,7 @@ public class GameStateController : PunBehaviour
     {
         if (!isGameStarted || !isLocalPlayerTurn) return;
 
-        photonView.RPC("UpdateTile",PhotonTargets.All, tileIndex, playerTurn);
+        photonView.RPC("UpdateTile", PhotonTargets.All, tileIndex, playerTurn);
         isLocalPlayerTurn = false;
         UpdateStatusText("Opponent's turn");
     }
@@ -142,8 +135,8 @@ public class GameStateController : PunBehaviour
     private void UpdateTile(int tileIndex, string player)
     {
         Debug.Log("UpdateTile: " + tileIndex + " " + player);
-        tileList[tileIndex-1].text = player;
-        tileList[tileIndex-1].GetComponentInParent<TileController>().UpdateUI();
+        tileList[tileIndex - 1].text = player;
+        tileList[tileIndex - 1].GetComponentInParent<TileController>().UpdateUI();
         moveCount++;
 
         if (CheckWinCondition(player))
@@ -200,7 +193,7 @@ public class GameStateController : PunBehaviour
         }
 
         isLocalPlayerTurn = (playerTurn == "X" && PhotonNetwork.player.IsMasterClient) ||
-                           (playerTurn == "O" && !PhotonNetwork.player.IsMasterClient);
+                            (playerTurn == "O" && !PhotonNetwork.player.IsMasterClient);
 
         UpdateStatusText(isLocalPlayerTurn ? "Your turn!" : "Opponent's turn");
     }
@@ -213,7 +206,7 @@ public class GameStateController : PunBehaviour
     {
         isGameStarted = false;
         ToggleButtonState(false);
-        
+
 
         switch (winningPlayer)
         {
@@ -229,6 +222,7 @@ public class GameStateController : PunBehaviour
                 {
                     uiManager.ShowLose();
                 }
+
                 break;
             case "O":
                 if (PhotonNetwork.player.IsMasterClient)
@@ -239,6 +233,7 @@ public class GameStateController : PunBehaviour
                 {
                     uiManager.ShowLose();
                 }
+
                 break;
             default:
                 uiManager.ShowLose();
@@ -298,7 +293,7 @@ public class GameStateController : PunBehaviour
         if (playerTurn == "X") return tilePlayerX;
         else return tilePlayerO;
     }
-    
+
 
     private void UpdateStatusText(string status)
     {
